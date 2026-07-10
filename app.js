@@ -1,16 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════
-   AttendX — Enhanced Application Logic
-   All 9 enhancements:
-     1. Animated gradient background
-     2. Confetti burst on marking attendance
-     3. Weekly sparkline chart per card
-     4. Timetable view (today's classes)
-     5. Subject-specific colour coding
-     6. Streak counter per component
-     7. Summary dashboard bar + motivational quotes
-     8. Card flip animation (front → detailed stats)
-     9. Everything wired together
-   ═══════════════════════════════════════════════════════════════ */
+
 import { auth, db } from './firebase-config.js';
 import { 
   createUserWithEmailAndPassword, 
@@ -28,9 +16,6 @@ import {
 let firestoreUnsubscribe = null;
 let currentUser = null;
 
-  /* ───────────────────────────────────────────────────────────
-     §1 — CONSTANTS
-  ─────────────────────────────────────────────────────────── */
   const STORAGE_KEY      = 'attendx_data_v2';
   const HISTORY_LIMIT    = 10;
   const REQUIRED_PCT     = 0.75;
@@ -38,7 +23,6 @@ let currentUser = null;
   const SVG_CIRCUMFERENCE = 2 * Math.PI * SVG_RADIUS;
   const SPARKLINE_DAYS   = 7;
 
-  /** Subject colour map — keys are lowercase abbreviation prefixes */
   const SUBJECT_COLOURS = {
     mce:  { hue: '#a78bfa', label: 'Violet'  },
     dsgt: { hue: '#2dd4bf', label: 'Teal'    },
@@ -51,7 +35,6 @@ let currentUser = null;
   };
   const DEFAULT_COLOUR = '#94a3b8';
 
-  /** Motivational quotes */
   const QUOTES = [
     "Consistency beats intensity.",
     "75% is the floor, not the ceiling.",
@@ -69,20 +52,15 @@ let currentUser = null;
     "Brick by brick, class by class.",
   ];
 
-  /** Timetable data — Empty by default for user customization */
   const DEFAULT_TIMETABLE = {
-    1: [], // Monday
-    2: [], // Tuesday
-    3: [], // Wednesday
-    4: [], // Thursday
-    5: [], // Friday
-    6: [], // Saturday
+    1: [], 
+    2: [], 
+    3: [], 
+    4: [], 
+    5: [], 
+    6: [], 
   };
 
-
-  /* ───────────────────────────────────────────────────────────
-     §2 — STORE  (State + Persistence)
-  ─────────────────────────────────────────────────────────── */
   const Store = {
     _state: {
       courses: [],
@@ -109,7 +87,6 @@ let currentUser = null;
     },
 
     hydrate() {
-      // Handled by Firestore database sync in AuthManager
     },
 
     getCourses()  { return this._state.courses; },
@@ -234,7 +211,6 @@ let currentUser = null;
       return true;
     },
 
-    /* ── Task checklist ── */
     addTask(courseId, text) {
       const course = this._state.courses.find(c => c.id === courseId);
       if (!course) return;
@@ -261,17 +237,15 @@ let currentUser = null;
       this._persist();
     },
 
-    /* ── Sparkline log helpers ── */
     _appendLog(comp, mark) {
       if (!comp.log) comp.log = [];
       comp.log.push({ mark, ts: Date.now() });
-      if (comp.log.length > 30) comp.log.shift(); // keep last 30
+      if (comp.log.length > 30) comp.log.shift(); 
     },
     _popLog(comp) {
       if (comp.log && comp.log.length > 0) comp.log.pop();
     },
 
-    /* ── History ── */
     _addHistory(type, text, meta = null) {
       this._state.history.unshift({ type, text, meta, time: Date.now(), undone: false });
       if (this._state.history.length > HISTORY_LIMIT) this._state.history.length = HISTORY_LIMIT;
@@ -279,10 +253,6 @@ let currentUser = null;
     _typeLabel(t) { return t === 'theory' ? 'Theory' : 'Lab'; },
   };
 
-
-  /* ───────────────────────────────────────────────────────────
-     §3 — MATH ENGINE
-  ─────────────────────────────────────────────────────────── */
   const MathEngine = {
     calc(attended, conducted) {
       if (conducted === 0) return { percentage: 100, isSafe: true, safeBunks: 0, requiredLectures: 0 };
@@ -305,10 +275,6 @@ let currentUser = null;
     },
   };
 
-
-  /* ───────────────────────────────────────────────────────────
-     §4 — SUBJECT COLOUR HELPER
-  ─────────────────────────────────────────────────────────── */
   function getSubjectColour(courseName) {
     const lower = courseName.toLowerCase();
     for (const key of Object.keys(SUBJECT_COLOURS)) {
@@ -317,11 +283,6 @@ let currentUser = null;
     return DEFAULT_COLOUR;
   }
 
-
-  /* ───────────────────────────────────────────────────────────
-     §5 — ANIMATED GRADIENT BACKGROUND
-     Renders a slow-moving fluid gradient on <canvas>.
-  ─────────────────────────────────────────────────────────── */
   const GradientBG = {
     canvas: null, ctx: null, time: 0, raf: null,
 
@@ -345,7 +306,6 @@ let currentUser = null;
       const ctx = this.ctx;
       ctx.clearRect(0, 0, w, h);
 
-      // Two drifting radial gradients
       const x1 = w * (0.3 + 0.2 * Math.sin(this.time * 0.7));
       const y1 = h * (0.2 + 0.15 * Math.cos(this.time * 0.5));
       const g1 = ctx.createRadialGradient(x1, y1, 0, x1, y1, w * 0.6);
@@ -374,11 +334,6 @@ let currentUser = null;
     },
   };
 
-
-  /* ───────────────────────────────────────────────────────────
-     §6 — CONFETTI ENGINE
-     Fires a burst of coloured particles on attendance mark.
-  ─────────────────────────────────────────────────────────── */
   const Confetti = {
     canvas: null, ctx: null, particles: [], active: false,
 
@@ -395,7 +350,6 @@ let currentUser = null;
       this.canvas.height = window.innerHeight;
     },
 
-    /** Fire confetti burst from a screen point */
     burst(x, y) {
       const colours = ['#22c55e', '#60a5fa', '#f472b6', '#facc15', '#a78bfa', '#fb923c'];
       for (let i = 0; i < 35; i++) {
@@ -424,7 +378,7 @@ let currentUser = null;
         const p = this.particles[i];
         p.x  += p.vx;
         p.y  += p.vy;
-        p.vy += 0.15;        // gravity
+        p.vy += 0.15;        
         p.life -= p.decay;
         p.rotation += p.rotSpeed;
 
@@ -447,10 +401,6 @@ let currentUser = null;
     },
   };
 
-
-  /* ───────────────────────────────────────────────────────────
-     §7 — RENDERER
-  ─────────────────────────────────────────────────────────── */
   const Renderer = {
     $grid: null, $emptyState: null, $headerStats: null,
     $historyList: null, $historyEmpty: null,
@@ -481,7 +431,6 @@ let currentUser = null;
       const dept = Store._state.department || 'Computer Engineering';
       const name = Store._state.name || '';
       const courses = Store.getCourses();
-      
       const headerTagline = document.getElementById('header-tagline');
       if (headerTagline) {
         headerTagline.textContent = `Semester ${sem} · ${dept}`;
@@ -497,7 +446,6 @@ let currentUser = null;
         welcomeBadge.textContent = `Semester ${sem} · ${dept}`;
       }
 
-      // Generate dynamic tagline stats
       const welcomeQuote = document.getElementById('welcome-quote');
       if (welcomeQuote) {
         let dynamicText = "";
@@ -509,7 +457,6 @@ let currentUser = null;
           const currentTimetable = Store._state.timetable || DEFAULT_TIMETABLE;
           const slots = currentTimetable[dayOfWeek] || [];
           const classCount = slots.length;
-          
           const classesText = classCount > 0 ? `${classCount} class${classCount === 1 ? '' : 'es'} scheduled today` : 'No classes scheduled today';
           const statusText = overall.isSafe ? `your attendance is safe (${Math.round(overall.percentage)}%)` : `attendance shortage: ${Math.round(overall.percentage)}%`;
           dynamicText = `${classesText} · ${statusText}`;
@@ -543,7 +490,6 @@ let currentUser = null;
       document.getElementById('analytics-danger-count').textContent = dangerCount;
     },
 
-    /* ── Cards ── */
     renderCards() {
       const courses = Store.getCourses();
       this.$grid.querySelectorAll('.card-flip-container').forEach(el => el.remove());
@@ -561,7 +507,6 @@ let currentUser = null;
         if (simControls) simControls.style.display = 'none';
         return;
       }
-      
       this.$emptyState.style.display = 'none';
       if (addCourseBar) addCourseBar.style.display = '';
       if (headerAddBtn) {
@@ -606,7 +551,6 @@ let currentUser = null;
       const badgeIcon  = comp.type === 'theory' ? '📖' : '🧪';
       const badgeLabel = comp.type === 'theory' ? 'Theory' : 'Lab';
 
-      // Status line
       let statusHtml = '';
       if (metrics.isSafe) {
         statusHtml = `<div class="stat-row"><span class="stat-label">Can Bunk</span><span class="stat-value safe">${metrics.safeBunks}</span></div>`;
@@ -614,20 +558,16 @@ let currentUser = null;
         statusHtml = `<div class="stat-row"><span class="stat-label">Need</span><span class="stat-value danger">${metrics.requiredLectures} more</span></div>`;
       }
 
-      // Percentage ring
       const pct = comp.conducted === 0 ? 100 : metrics.percentage;
       const offset = SVG_CIRCUMFERENCE - (SVG_CIRCUMFERENCE * Math.min(pct, 100) / 100);
       const strokeColor = metrics.isSafe ? 'var(--safe)' : 'var(--danger)';
 
-      // Sparkline (last 7 entries)
       const sparkHtml = this._buildSparkline(comp);
 
-      // Streak badge
       const streakHtml = streak >= 2
         ? `<span class="streak-badge">🔥 ${streak}</span>`
         : '';
 
-      // Short name for display
       const shortName = course.name.split('—')[0].trim();
 
       return `
@@ -708,7 +648,6 @@ let currentUser = null;
             <span>${this._esc(shortName)} · ${typeLabel}</span>
             <button class="btn-icon-sm flip-btn" data-action="flip" data-course-id="${course.id}" data-type="${comp.type}" title="Back to front">✕</button>
           </div>
-          
           <div class="back-stats-grid" style="margin-bottom:12px;">
             <div class="back-stat-item" style="padding:6px 4px;">
               <span class="back-stat-value" style="font-size:0.95rem;color:${metrics.isSafe ? 'var(--safe)' : 'var(--danger)'};">${Math.round(pct)}%</span>
@@ -727,7 +666,6 @@ let currentUser = null;
               <span class="back-stat-label" style="font-size:0.5rem;">Needed</span>
             </div>
           </div>
-          
           <div class="tasks-container">
             <div class="tasks-header">📋 Course Tasks</div>
             <ul class="tasks-list">
@@ -738,12 +676,10 @@ let currentUser = null;
               <button type="submit" class="btn-task-add">Add</button>
             </form>
           </div>
-          
           <button class="btn-flip-back" data-action="flip" data-course-id="${course.id}" data-type="${comp.type}">← Back to Card</button>
         </div>`;
     },
 
-    /* ── Sparkline ── */
     _buildSparkline(comp) {
       const log = comp.log || [];
       const recent = log.slice(-SPARKLINE_DAYS);
@@ -762,7 +698,6 @@ let currentUser = null;
       return `<div class="sparkline-row"><div class="sparkline-label">Last ${Math.min(recent.length, SPARKLINE_DAYS)} classes</div><div class="sparkline-bar-container">${bars}</div></div>`;
     },
 
-    /* ── Overall pill ── */
     renderOverall() {
       const courses = Store.getCourses();
       if (courses.length === 0) { this.$headerStats.innerHTML = ''; return; }
@@ -771,7 +706,6 @@ let currentUser = null;
       this.$headerStats.innerHTML = `<div class="overall-pill ${cls}"><span class="pill-label">Overall</span>${Math.round(o.percentage)}%</div>`;
     },
 
-    /* ── Summary Dashboard Bar ── */
     renderSummaryBar() {
       const courses = Store.getCourses();
       let totalAttended = 0, totalConducted = 0, totalBunks = 0;
@@ -792,9 +726,8 @@ let currentUser = null;
 
     },
 
-    /* ── Timetable ── */
     renderTimetable() {
-      const dayOfWeek = new Date().getDay(); // 0=Sun, 1=Mon...
+      const dayOfWeek = new Date().getDay(); 
       const currentTimetable = Store._state.timetable || DEFAULT_TIMETABLE;
       const slots = currentTimetable[dayOfWeek] || [];
       const toggleBar = document.querySelector('.timetable-toggle-bar');
@@ -817,7 +750,6 @@ let currentUser = null;
         const abbr = slot.subject.split(/[\s/\-]/)[0].toLowerCase();
         const colour = SUBJECT_COLOURS[abbr] ? SUBJECT_COLOURS[abbr].hue : DEFAULT_COLOUR;
 
-        // Find course matching the timetable slot subject
         const slotSubjectLower = slot.subject.trim().toLowerCase();
         const matchedCourse = courses.find(c => {
           const cNameLower = c.name.toLowerCase();
@@ -850,16 +782,13 @@ let currentUser = null;
       }
     },
 
-    /* ── History ── */
     renderHistory() {
       const history = Store.getHistory();
       this.$historyList.innerHTML = '';
-      
       if (history.length === 0) {
         if (this.$historySection) this.$historySection.style.display = 'none';
         return;
       }
-      
       if (this.$historySection) this.$historySection.style.display = 'block';
       this.$historyEmpty.style.display = 'none';
 
@@ -892,10 +821,6 @@ let currentUser = null;
     },
   };
 
-
-  /* ───────────────────────────────────────────────────────────
-     §8 — TOAST
-  ─────────────────────────────────────────────────────────── */
   function showToast(msg, duration = 2000) {
     const c = document.getElementById('toast-container');
     const t = document.createElement('div');
@@ -903,21 +828,14 @@ let currentUser = null;
     setTimeout(() => { t.classList.add('out'); t.addEventListener('animationend', () => t.remove()); }, duration);
   }
 
-
-  /* ───────────────────────────────────────────────────────────
-     §9 — CONTROLLER
-  ─────────────────────────────────────────────────────────── */
   const Controller = {
     init() {
-      // Add course
       document.getElementById('btn-open-add-modal').addEventListener('click', () => this.openModal());
-      
       const headerAddBtn = document.getElementById('btn-header-add-course');
       if (headerAddBtn) {
         headerAddBtn.addEventListener('click', () => this.openModal());
       }
 
-      // Modal
       document.getElementById('modal-close').addEventListener('click',      () => this.closeModal());
       document.getElementById('btn-cancel-modal').addEventListener('click', () => this.closeModal());
       document.getElementById('modal-overlay').addEventListener('click', (e) => {
@@ -927,20 +845,17 @@ let currentUser = null;
         e.preventDefault(); this.handleFormSubmit();
       });
 
-      // Dashboard delegated
       document.getElementById('dashboard-grid').addEventListener('click', (e) => {
         const emptyAddBtn = e.target.closest('#btn-empty-add-course');
         if (emptyAddBtn) {
           this.openModal();
           return;
         }
-        
         const btn = e.target.closest('[data-action]');
         if (!btn) return;
         this.handleCardAction(btn, e);
       });
 
-      // History undo
       document.getElementById('history-list').addEventListener('click', (e) => {
         const btn = e.target.closest('.history-undo-btn');
         if (!btn) return;
@@ -950,13 +865,11 @@ let currentUser = null;
         }
       });
 
-      // Confirm dialog
       document.getElementById('confirm-cancel').addEventListener('click',  () => this.closeConfirm());
       document.getElementById('confirm-overlay').addEventListener('click', (e) => {
         if (e.target.id === 'confirm-overlay') this.closeConfirm();
       });
 
-      // Timetable toggle
       document.getElementById('btn-toggle-timetable').addEventListener('click', () => {
         const section = document.getElementById('timetable-section');
         const btn = document.getElementById('btn-toggle-timetable');
@@ -964,14 +877,12 @@ let currentUser = null;
         btn.classList.toggle('open');
       });
 
-      // Timetable quick check-ins
       document.getElementById('timetable-grid').addEventListener('click', (e) => {
         const btn = e.target.closest('[data-action="tt-present"], [data-action="tt-absent"]');
         if (!btn) return;
         const courseId = parseInt(btn.dataset.courseId, 10);
         const type = btn.dataset.type;
         const action = btn.dataset.action;
-        
         if (action === 'tt-present') {
           Store.markPresent(courseId, type);
           const rect = btn.getBoundingClientRect();
@@ -984,15 +895,12 @@ let currentUser = null;
         Renderer.render();
       });
 
-      // Keyboard
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') { this.closeModal(); this.closeConfirm(); }
       });
 
-      // Refresh history times
       setInterval(() => Renderer.renderHistory(), 30000);
 
-      // Initialize settings, timetables, pomodoro, and task handlers
       this.initSettingsAndTools();
     },
 
@@ -1032,7 +940,6 @@ let currentUser = null;
       switch (action) {
         case 'present':
           Store.markPresent(courseId, type);
-          // Confetti burst from the button position
           if (event) {
             const rect = btn.getBoundingClientRect();
             Confetti.burst(rect.left + rect.width / 2, rect.top);
@@ -1090,7 +997,6 @@ let currentUser = null;
     },
 
     initSettingsAndTools() {
-      // 1. Settings tab controls
       document.querySelectorAll('.settings-tabs .tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           document.querySelectorAll('.settings-tabs .tab-btn').forEach(b => b.classList.remove('active'));
@@ -1104,7 +1010,6 @@ let currentUser = null;
         });
       });
 
-      // 2. Settings button open/close
       const settingsOverlay = document.getElementById('settings-overlay');
       document.getElementById('btn-settings').addEventListener('click', () => {
         this.openSettingsModal();
@@ -1120,7 +1025,6 @@ let currentUser = null;
         }
       });
 
-      // 3. Alerts Toggle listener
       const alertsCheckbox = document.getElementById('alerts-enabled');
       alertsCheckbox.addEventListener('change', (e) => {
         const fields = document.getElementById('alerts-config-fields');
@@ -1133,7 +1037,6 @@ let currentUser = null;
         }
       });
 
-      // 4. Submit Profile Settings form
       document.getElementById('settings-profile-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const name = document.getElementById('settings-name').value.trim();
@@ -1149,14 +1052,12 @@ let currentUser = null;
         Renderer.render();
       });
 
-      // 5. Submit Alerts Form
       document.getElementById('settings-alerts-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const enabled = document.getElementById('alerts-enabled').checked;
         const serviceId = document.getElementById('alerts-service-id').value.trim();
         const templateId = document.getElementById('alerts-template-id').value.trim();
         const publicKey = document.getElementById('alerts-public-key').value.trim();
-        
         if (enabled && (!serviceId || !templateId || !publicKey)) {
           showToast('Please fill all EmailJS parameters to enable.');
           return;
@@ -1173,7 +1074,6 @@ let currentUser = null;
         showToast('Alert configurations saved!');
       });
 
-      // 6. Submit Onboarding Form
       document.getElementById('onboarding-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const name = document.getElementById('onboard-name').value.trim();
@@ -1190,7 +1090,6 @@ let currentUser = null;
         Renderer.render();
       });
 
-      // 7. Add Timetable Slot Form
       document.getElementById('tt-add-slot-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const day = parseInt(document.getElementById('tt-editor-day').value, 10);
@@ -1214,13 +1113,11 @@ let currentUser = null;
         showToast('Class slot added!');
       });
 
-      // 8. Timetable Slot deletions
       document.getElementById('tt-slots-list').addEventListener('click', (e) => {
         const btn = e.target.closest('[data-action="delete-slot"]');
         if (!btn) return;
         const day = parseInt(btn.dataset.day, 10);
         const idx = parseInt(btn.dataset.idx, 10);
-        
         if (!Store._state.timetable) {
           Store._state.timetable = JSON.parse(JSON.stringify(DEFAULT_TIMETABLE));
         }
@@ -1231,12 +1128,10 @@ let currentUser = null;
         showToast('Class slot deleted!');
       });
 
-      // 9. Day select trigger in Timetable Editor
       document.getElementById('tt-editor-day').addEventListener('change', () => {
         this.renderTimetableEditor();
       });
 
-      // 10. Task Add submission inside dashboard grid
       document.getElementById('dashboard-grid').addEventListener('submit', (e) => {
         const form = e.target.closest('.task-add-form');
         if (!form) return;
@@ -1252,7 +1147,6 @@ let currentUser = null;
         }
       });
 
-      // 11. Task Toggle checkbox change inside dashboard grid
       document.getElementById('dashboard-grid').addEventListener('change', (e) => {
         const checkbox = e.target.closest('[data-action="toggle-task"]');
         if (!checkbox) return;
@@ -1267,7 +1161,6 @@ let currentUser = null;
       document.getElementById('settings-name').value = Store._state.name || '';
       document.getElementById('settings-semester').value = Store._state.semester || 3;
       document.getElementById('settings-department').value = Store._state.department || '';
-      
       const config = Store._state.emailAlertsConfig || {};
       const alertsCheckbox = document.getElementById('alerts-enabled');
       alertsCheckbox.checked = config.enabled || false;
@@ -1284,7 +1177,6 @@ let currentUser = null;
         fields.style.pointerEvents = 'none';
       }
 
-      // Default to profile tab
       document.querySelectorAll('.settings-tabs .tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.modal-settings .tab-content').forEach(c => c.classList.add('hidden'));
       const activeBtn = document.querySelector('.settings-tabs .tab-btn[data-tab="tab-profile"]');
@@ -1301,7 +1193,6 @@ let currentUser = null;
       const slots = timetable[day] || [];
       const list = document.getElementById('tt-slots-list');
       list.innerHTML = '';
-      
       if (slots.length === 0) {
         list.innerHTML = '<p style="color:var(--text-muted);font-size:0.75rem;text-align:center;padding:12px 0;">No classes scheduled for this day.</p>';
         return;
@@ -1323,10 +1214,6 @@ let currentUser = null;
     },
   };
 
-
-  /* ───────────────────────────────────────────────────────────
-     §9.5 — AUTH MANAGER
-  ─────────────────────────────────────────────────────────── */
   const AuthManager = {
     init() {
       const $overlay = document.getElementById('auth-overlay');
@@ -1334,18 +1221,14 @@ let currentUser = null;
       const $registerView = document.getElementById('register-view');
       const $verificationView = document.getElementById('verification-view');
       const $userEmailPlaceholder = document.getElementById('user-email-placeholder');
-      
       const $toRegisterBtn = document.getElementById('to-register-btn');
       const $toLoginBtn = document.getElementById('to-login-btn');
-      
       const $loginForm = document.getElementById('login-form');
       const $registerForm = document.getElementById('register-form');
-      
       const $resendBtn = document.getElementById('btn-resend-verification');
       const $verifyLogoutBtn = document.getElementById('btn-verification-logout');
       const $headerLogoutBtn = document.getElementById('btn-logout');
 
-      // Toggle Login / Register view
       $toRegisterBtn.addEventListener('click', (e) => {
         e.preventDefault();
         $loginView.classList.add('hidden');
@@ -1358,13 +1241,11 @@ let currentUser = null;
         $loginView.classList.remove('hidden');
       });
 
-      // Handle Sign In submission
       $loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value.trim();
         const pass = document.getElementById('login-password').value;
         const btn = document.getElementById('btn-login-submit');
-        
         try {
           btn.disabled = true;
           btn.textContent = 'Signing In...';
@@ -1379,7 +1260,6 @@ let currentUser = null;
         }
       });
 
-      // Handle Registration submission
       $registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('register-email').value.trim();
@@ -1411,7 +1291,6 @@ let currentUser = null;
         }
       });
 
-      // Resend verification link
       $resendBtn.addEventListener('click', async () => {
         if (auth.currentUser) {
           try {
@@ -1428,7 +1307,6 @@ let currentUser = null;
         }
       });
 
-      // Logout operations
       const logoutAction = async () => {
         try {
           showToast('Logging out...');
@@ -1441,7 +1319,6 @@ let currentUser = null;
       $verifyLogoutBtn.addEventListener('click', logoutAction);
       $headerLogoutBtn.addEventListener('click', logoutAction);
 
-      // Listen to Auth State
       onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         if (user) {
@@ -1449,7 +1326,6 @@ let currentUser = null;
           $overlay.classList.remove('open');
           $overlay.setAttribute('aria-hidden', 'true');
           $headerLogoutBtn.style.display = 'block';
-          
           this.setupDatabaseSync(user.uid);
         } else {
           this.stopVerificationCheck();
@@ -1465,7 +1341,6 @@ let currentUser = null;
           $overlay.classList.add('open');
           $overlay.setAttribute('aria-hidden', 'false');
           $headerLogoutBtn.style.display = 'none';
-          
           Renderer.render();
         }
       });
@@ -1500,13 +1375,10 @@ let currentUser = null;
 
     setupDatabaseSync(uid) {
       if (firestoreUnsubscribe) return;
-      
       showToast('Syncing database...');
       firestoreUnsubscribe = onSnapshot(doc(db, "users", uid), async (docSnap) => {
         if (docSnap.exists()) {
           Store._state = docSnap.data();
-          
-          // Show onboarding overlay if semester or department is not configured
           const onboardOverlay = document.getElementById('onboarding-overlay');
           if (!Store._state.name || !Store._state.semester || !Store._state.department) {
             onboardOverlay.classList.add('open');
@@ -1516,7 +1388,6 @@ let currentUser = null;
             onboardOverlay.setAttribute('aria-hidden', 'true');
           }
         } else {
-          // Initialize empty user profile in Firestore
           Store._state = {
             courses: [],
             history: [],
@@ -1554,28 +1425,20 @@ let currentUser = null;
     }
   };
 
-  /* ───────────────────────────────────────────────────────────
-     §9.6 — EMAIL ALERT MANAGER
-  ─────────────────────────────────────────────────────────── */
   const AlertManager = {
     async checkAndSendAlert(course, comp) {
       const config = Store._state.emailAlertsConfig;
       if (!config || !config.enabled || !config.serviceId || !config.templateId || !config.publicKey) return;
-      
       const metrics = MathEngine.calc(comp.attended, comp.conducted);
       if (metrics.percentage >= 75) return;
-      
-      // Prevent spam: only alert once every 24 hours per course component
       if (!config.alertHistory) config.alertHistory = {};
       const key = `${course.id}_${comp.type}`;
       const lastSent = config.alertHistory[key] || 0;
       const now = Date.now();
-      
       if (now - lastSent < 24 * 60 * 60 * 1000) {
         console.log(`[AlertManager] Suppressed drop email alert for ${course.name} (${comp.type}) to limit rate.`);
         return;
       }
-      
       try {
         emailjs.init(config.publicKey);
         const params = {
@@ -1583,11 +1446,8 @@ let currentUser = null;
           course_name: `${course.name} (${comp.type === 'theory' ? 'Theory' : 'Lab'})`,
           percentage: Math.round(metrics.percentage)
         };
-        
         await emailjs.send(config.serviceId, config.templateId, params);
         console.log(`[AlertManager] Attendance alert email sent for ${course.name}`);
-        
-        // Log history timestamp
         config.alertHistory[key] = now;
         Store._persist();
         showToast(`Email alert sent for ${course.name}!`);
@@ -1597,12 +1457,9 @@ let currentUser = null;
     }
   };
 
-  /* ───────────────────────────────────────────────────────────
-     §9.7 — POMODORO ENGINE
-  ─────────────────────────────────────────────────────────── */
   const Pomodoro = {
     timer: null,
-    timeLeft: 1500, // 25 min default
+    timeLeft: 1500, 
     isRunning: false,
     audio: null,
 
@@ -1611,7 +1468,6 @@ let currentUser = null;
       const $pauseBtn = document.getElementById('btn-pomo-pause');
       const $resetBtn = document.getElementById('btn-pomo-reset');
       const $audioSelect = document.getElementById('pomo-audio-track');
-      
       $startBtn.addEventListener('click', () => this.start());
       $pauseBtn.addEventListener('click', () => this.pause());
       $resetBtn.addEventListener('click', () => this.reset());
@@ -1637,7 +1493,6 @@ let currentUser = null;
       this.isRunning = true;
       document.getElementById('btn-pomo-start').disabled = true;
       document.getElementById('btn-pomo-pause').disabled = false;
-      
       this.timer = setInterval(() => {
         this.timeLeft--;
         this.updateDisplay();
@@ -1685,7 +1540,6 @@ let currentUser = null;
         this.audio = null;
         return;
       }
-      
       let src = '';
       if (track === 'lofi') src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3';
       if (track === 'rain') src = 'https://archive.org/download/rain_loop/rain_loop.mp3';
@@ -1693,7 +1547,6 @@ let currentUser = null;
 
       this.audio = new Audio(src);
       this.audio.loop = true;
-      
       if (this.isRunning) {
         this.playAudio();
       }
@@ -1714,15 +1567,11 @@ let currentUser = null;
     }
   };
 
-  /* ───────────────────────────────────────────────────────────
-     §9.8 — BUNK SIMULATOR ENGINE
-  ─────────────────────────────────────────────────────────── */
   const BunkSimulator = {
     init() {
       const $select = document.getElementById('sim-subject-select');
       const $slider = document.getElementById('sim-slider');
       const $valLabel = document.getElementById('sim-value-label');
-      
       $select.addEventListener('change', () => {
         const key = $select.value;
         if (key) {
@@ -1738,7 +1587,6 @@ let currentUser = null;
         }
         this.runSimulation();
       });
-      
       $slider.addEventListener('input', (e) => {
         const val = parseInt(e.target.value, 10);
         $valLabel.textContent = val > 0 ? `+${val}` : `${val}`;
@@ -1751,7 +1599,6 @@ let currentUser = null;
       const courses = Store.getCourses();
       const currentSelected = $select.value;
       $select.innerHTML = '<option value="">-- Choose Subject Component --</option>';
-      
       courses.forEach(c => {
         c.components.forEach(comp => {
           const key = `${c.id}_${comp.type}`;
@@ -1759,8 +1606,6 @@ let currentUser = null;
           $select.innerHTML += `<option value="${key}">${c.name} (${typeLabel})</option>`;
         });
       });
-      
-      // Preserve selection if it still exists
       if (currentSelected) {
         $select.value = currentSelected;
       }
@@ -1770,7 +1615,6 @@ let currentUser = null;
       const $select = document.getElementById('sim-subject-select');
       const $slider = document.getElementById('sim-slider');
       const $results = document.getElementById('sim-results');
-      
       const key = $select.value;
       if (!key) {
         $results.textContent = 'Select a subject component above to simulate.';
@@ -1795,19 +1639,16 @@ let currentUser = null;
       const simMetrics = MathEngine.calc(simulatedAttended, simulatedConducted);
       const pct = simulatedConducted === 0 ? 100 : simMetrics.percentage;
       const currentMetrics = MathEngine.calc(comp.attended, comp.conducted);
-      
       const colorClass = simMetrics.isSafe ? 'var(--safe)' : 'var(--danger)';
       const currentPct = comp.conducted === 0 ? 100 : currentMetrics.percentage;
 
       let resultText = `<div style="margin-bottom:8px;">Current: <strong>${Math.round(currentPct)}%</strong>. Projected: <strong style="color:${colorClass}">${Math.round(pct)}%</strong>.</div>`;
-      
       if (simMetrics.isSafe) {
         resultText += `<div style="margin-bottom:10px;">Simulation: <span style="color:var(--safe);font-weight:700;">SAFE</span>. You will have <strong>${simMetrics.safeBunks}</strong> safe bunks left.</div>`;
       } else {
         resultText += `<div style="margin-bottom:10px;">Simulation: <span style="color:var(--danger);font-weight:700;">SHORTAGE</span>. You will need to attend <strong>${simMetrics.requiredLectures}</strong> classes to recover.</div>`;
       }
 
-      // Add Threshold Calculator Forecast Output
       resultText += `<div style="border-top:1px solid var(--border); padding-top:8px; font-size:0.7rem; color:var(--text-secondary); text-align:left;">`;
       if (currentMetrics.isSafe) {
         resultText += `🎯 <strong>Threshold Forecast:</strong> You are currently above 75%. You can safely bunk the next <strong>${currentMetrics.safeBunks}</strong> classes consecutive.`;
@@ -1820,9 +1661,6 @@ let currentUser = null;
     }
   };
 
-  /* ───────────────────────────────────────────────────────────
-     §10 — BOOT
-  ─────────────────────────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', () => {
     Renderer.init();
     Controller.init();
@@ -1832,7 +1670,6 @@ let currentUser = null;
     Pomodoro.init();
     BunkSimulator.init();
 
-    // Show dynamic settings button if authenticated
     onAuthStateChanged(auth, (user) => {
       const settingsBtn = document.getElementById('btn-settings');
       if (settingsBtn) {

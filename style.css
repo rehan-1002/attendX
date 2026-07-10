@@ -1,12 +1,5 @@
-/* ═══════════════════════════════════════════════════════════════
-   AttendX — Enhanced Stylesheet
-   Dark theme · Fluid gradients · Glassmorphism · Card flips
-   Subject color-coding · Micro-animations · Mobile-first
-   ═══════════════════════════════════════════════════════════════ */
 
-/* ─── Design Tokens ────────────────────────────────────────── */
 :root {
-  /* Surfaces */
   --bg-base:       #06080f;
   --bg-surface:    #0d1117;
   --bg-card:       rgba(17, 24, 39, 0.75);
@@ -15,12 +8,10 @@
   --bg-input:      #0a0f1a;
   --bg-modal:      rgba(15, 20, 32, 0.95);
 
-  /* Accent */
   --accent:        #6366f1;
   --accent-soft:   rgba(99, 102, 241, 0.12);
   --accent-glow:   rgba(99, 102, 241, 0.30);
 
-  /* Semantic */
   --safe:          #22c55e;
   --safe-soft:     rgba(34, 197, 94, 0.10);
   --safe-glow:     rgba(34, 197, 94, 0.25);
@@ -30,36 +21,30 @@
   --warn:          #f59e0b;
   --warn-soft:     rgba(245, 158, 11, 0.10);
 
-  /* Subject colours — each subject gets a unique hue */
-  --clr-mce:    #a78bfa;   /* Violet   */
-  --clr-dsgt:   #2dd4bf;   /* Teal     */
-  --clr-aoa:    #60a5fa;   /* Blue     */
-  --clr-coa:    #f472b6;   /* Pink     */
-  --clr-oe:     #a3e635;   /* Lime     */
-  --clr-fsjp:   #fb923c;   /* Orange   */
-  --clr-ed:     #facc15;   /* Yellow   */
-  --clr-ese:    #38bdf8;   /* Sky      */
-  --clr-default:#94a3b8;   /* Slate    */
+  --clr-mce:    #a78bfa;   
+  --clr-dsgt:   #2dd4bf;   
+  --clr-aoa:    #60a5fa;   
+  --clr-coa:    #f472b6;   
+  --clr-oe:     #a3e635;   
+  --clr-fsjp:   #fb923c;   
+  --clr-ed:     #facc15;   
+  --clr-ese:    #38bdf8;   
+  --clr-default:#94a3b8;   
 
-  /* Text */
   --text-primary:   #f1f5f9;
   --text-secondary: #94a3b8;
   --text-muted:     #64748b;
 
-  /* Border */
   --border:        rgba(148, 163, 184, 0.06);
   --border-focus:  rgba(99, 102, 241, 0.5);
 
-  /* Radii */
   --radius-sm:  10px;
   --radius-md:  16px;
   --radius-lg:  22px;
 
-  /* Fonts */
   --font-sans:  'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
 
-  /* Motion */
   --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --dur-sm: 150ms;
@@ -67,8 +52,6 @@
   --dur-lg: 450ms;
 }
 
-
-/* ─── Reset ────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
@@ -87,8 +70,6 @@ body {
   position: relative;
 }
 
-
-/* ─── Animated Gradient Canvas ─────────────────────────────── */
 #gradient-canvas {
   position: fixed;
   inset: 0;
@@ -108,8 +89,6 @@ body {
   pointer-events: none;
 }
 
-
-/* ─── Header ───────────────────────────────────────────────── */
 #app-header {
   position: sticky;
   top: 0;
@@ -141,7 +120,6 @@ body {
   text-transform: uppercase;
 }
 
-/* Overall pill */
 .overall-pill {
   display: inline-flex;
   align-items: center;
@@ -164,8 +142,6 @@ body {
   opacity: 0.8;
 }
 
-
-/* ═══ SUMMARY DASHBOARD BAR ═══════════════════════════════ */
 .summary-bar {
   position: relative;
   z-index: 10;
@@ -227,8 +203,6 @@ body {
   .summary-label { font-size: 0.55rem; letter-spacing: 0.2px; }
 }
 
-
-/* ═══ TIMETABLE ═══════════════════════════════════════════ */
 .timetable-toggle-bar {
   margin-bottom: 12px;
 }
@@ -324,8 +298,6 @@ body {
   color: var(--safe);
 }
 
-
-/* ─── Main ─────────────────────────────────────────────────── */
 #app-main {
   position: relative;
   z-index: 10;
@@ -334,8 +306,6 @@ body {
   padding: 16px 16px 80px;
 }
 
-
-/* ─── Add-Course Bar ───────────────────────────────────────── */
 .add-course-bar { margin-bottom: 20px; }
 
 .btn-add-course {
@@ -362,8 +332,6 @@ body {
 }
 .btn-add-course .btn-icon { font-size: 1.15rem; line-height: 1; }
 
-
-/* ═══ DASHBOARD GRID ══════════════════════════════════════ */
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -384,8 +352,6 @@ body {
 .empty-state h2 { font-size: 1.15rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
 .empty-state p  { font-size: 0.82rem; max-width: 280px; margin: 0 auto; }
 
-
-/* ═══ CARD — 3D FLIP CONTAINER ════════════════════════════ */
 .card-flip-container {
   perspective: 900px;
   animation: cardEntrance var(--dur-lg) var(--ease-spring) both;
@@ -402,7 +368,6 @@ body {
   transform: rotateY(180deg);
 }
 
-/* Front face: stays in normal flow so it defines the container height */
 .card-front {
   position: relative;
   z-index: 2;
@@ -412,7 +377,6 @@ body {
   overflow: hidden;
 }
 
-/* Back face: absolute overlay, fills the front's height */
 .card-back {
   position: absolute;
   inset: 0;
@@ -424,8 +388,6 @@ body {
   transform: rotateY(180deg);
 }
 
-
-/* ═══ ATTENDANCE CARD (front) ═════════════════════════════ */
 .attend-card {
   position: relative;
   background: var(--bg-card);
@@ -437,7 +399,6 @@ body {
   overflow: hidden;
 }
 
-/* Coloured top accent bar — driven by subject colour */
 .attend-card::before {
   content: '';
   position: absolute;
@@ -456,7 +417,6 @@ body {
   box-shadow: 0 12px 40px rgba(0,0,0,0.3);
 }
 
-/* Card head */
 .card-head {
   display: flex;
   align-items: flex-start;
@@ -487,7 +447,6 @@ body {
 .card-badge.theory { background: rgba(99,102,241,.12); color: #818cf8; }
 .card-badge.lab    { background: rgba(245,158,11,.12); color: #fbbf24; }
 
-/* Streak badge */
 .streak-badge {
   display: inline-flex;
   align-items: center;
@@ -524,8 +483,6 @@ body {
 .btn-icon-sm.delete:hover { background: var(--danger-soft); color: var(--danger); }
 .btn-icon-sm.flip-btn:hover { background: var(--accent-soft); color: var(--accent); }
 
-
-/* ─── Ring + Stats ─────────────────────────────────────────── */
 .card-body {
   display: flex;
   align-items: center;
@@ -581,8 +538,6 @@ body {
 .stat-value.danger { color: var(--danger); }
 .stat-value.warn   { color: var(--warn); }
 
-
-/* ─── Sparkline ────────────────────────────────────────────── */
 .sparkline-row {
   margin-bottom: 12px;
   padding: 0 2px;
@@ -611,8 +566,6 @@ body {
 .sparkline-bar.absent  { background: var(--danger); opacity: 0.7; }
 .sparkline-bar.empty   { background: rgba(148,163,184,.08); }
 
-
-/* ─── Quick Actions ────────────────────────────────────────── */
 .card-quick-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -655,8 +608,6 @@ body {
 .btn-quick:active { transform: scale(0.90); }
 .btn-quick:disabled { opacity: 0.25; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
 
-
-/* ═══ CARD BACK (detailed stats) ══════════════════════════ */
 .card-back-inner {
   height: 100%;
   background: var(--bg-card);
@@ -720,8 +671,6 @@ body {
 }
 .btn-flip-back:hover { background: rgba(148,163,184,.06); color: var(--text-primary); }
 
-
-/* ─── History ──────────────────────────────────────────────── */
 .history-section { margin-top: 12px; }
 .section-title {
   display: flex; align-items: center; gap: 8px;
@@ -780,8 +729,6 @@ body {
   padding: 16px 0;
 }
 
-
-/* ─── Modals ───────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 1000;
   background: rgba(0,0,0,0.55);
@@ -823,8 +770,6 @@ body {
 .modal-confirm h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
 .modal-confirm p  { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; }
 
-
-/* ─── Forms ────────────────────────────────────────────────── */
 .form-group { margin-bottom: 18px; text-align: left; }
 .form-group label {
   display: block;
@@ -875,8 +820,6 @@ body {
 
 .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
 
-
-/* ─── Buttons ──────────────────────────────────────────────── */
 .btn {
   padding: 10px 22px; border-radius: var(--radius-sm); border: none;
   font-family: var(--font-sans); font-size: 0.82rem; font-weight: 600;
@@ -889,8 +832,6 @@ body {
 .btn-danger { background: var(--danger); color: #fff; }
 .btn-danger:hover { background: #dc2626; box-shadow: 0 4px 20px var(--danger-glow); }
 
-
-/* ─── Toast ────────────────────────────────────────────────── */
 .toast-container {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
   z-index: 2000; display: flex; flex-direction: column; gap: 8px;
@@ -909,8 +850,6 @@ body {
 }
 .toast.out { animation: toastOut var(--dur-md) var(--ease-out) forwards; }
 
-
-/* ─── Animations ───────────────────────────────────────────── */
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -932,13 +871,11 @@ body {
   50%      { transform: scale(1.15); }
 }
 
-/* ─── Scrollbar ────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(148,163,184,.12); border-radius: 100px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,.2); }
 
-/* ─── Extra small screens ──────────────────────────────────── */
 @media (max-width: 400px) {
   #app-header { padding: 10px 12px; }
   .header-brand h1 { font-size: 1.15rem; }
@@ -950,7 +887,6 @@ body {
   .btn-quick { width: 30px; height: 30px; font-size: 0.9rem; }
 }
 
-/* ─── Authentication styles ───────────────────────────────── */
 .header-actions {
   display: flex;
   align-items: center;
@@ -1093,7 +1029,6 @@ body {
   width: 100%;
 }
 
-/* ─── Settings Button ─────────────────────────────────────── */
 .btn-settings {
   background: rgba(99, 102, 241, 0.08);
   color: var(--accent);
@@ -1115,7 +1050,6 @@ body {
   box-shadow: 0 0 15px var(--accent-glow);
 }
 
-/* ─── Settings Tabs ───────────────────────────────────────── */
 .settings-tabs {
   display: flex;
   gap: 6px;
@@ -1148,7 +1082,6 @@ body {
   display: none;
 }
 
-/* ─── Timetable Editor ────────────────────────────────────── */
 .timetable-slots-list {
   display: flex;
   flex-direction: column;
@@ -1207,7 +1140,6 @@ body {
   border-color: var(--border-focus);
 }
 
-/* ─── Pomodoro Timer ──────────────────────────────────────── */
 .pomodoro-section {
   margin-bottom: 20px;
 }
@@ -1326,7 +1258,6 @@ body {
   background: rgba(255, 255, 255, 0.04);
 }
 
-/* ─── Analytics and Bunk Simulator ─────────────────────────── */
 .analytics-simulator-bar {
   display: grid;
   grid-template-columns: 1fr;
@@ -1471,7 +1402,6 @@ body {
   text-align: center;
 }
 
-/* ─── Task Checklist inside Card Back ────────────────────────── */
 .tasks-container {
   display: flex;
   flex-direction: column;
@@ -1576,7 +1506,6 @@ body {
   opacity: 0.9;
 }
 
-/* ─── Welcome Banner & Quote ───────────────────────────────── */
 .welcome-banner {
   display: flex;
   align-items: center;
@@ -1625,5 +1554,4 @@ body {
     padding: 16px;
   }
 }
-
 

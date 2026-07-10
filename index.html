@@ -6,24 +6,19 @@
   <meta name="description" content="AttendX — Sem III attendance tracker for BE Computer Engineering. Track theory & lab, calculate safe bunks, and stay above 75%." />
   <title>AttendX — Attendance Tracker</title>
 
-  <!-- Google Fonts: Outfit + Inter + JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="style.css" />
-  <!-- EmailJS SDK -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
-  <!-- ═══ ANIMATED GRADIENT CANVAS (behind everything) ═══ -->
   <canvas id="gradient-canvas" aria-hidden="true"></canvas>
 
-  <!-- ═══ CONFETTI CANVAS (above cards, below modals) ═══ -->
   <canvas id="confetti-canvas" aria-hidden="true"></canvas>
 
-  <!-- ═══ HEADER ═══ -->
   <header id="app-header">
     <div class="header-brand">
       <h1><span class="brand-icon">📊</span> Attend<span class="brand-accent">X</span></h1>
@@ -37,7 +32,6 @@
     </div>
   </header>
 
-  <!-- ═══ SUMMARY DASHBOARD BAR ═══ -->
   <section class="summary-bar" id="summary-bar">
     <div class="summary-card">
       <span class="summary-icon">📚</span>
@@ -62,10 +56,8 @@
     </div>
   </section>
 
-  <!-- ═══ MAIN CONTENT ═══ -->
   <main id="app-main">
 
-    <!-- Welcome Banner & Quote -->
     <div class="welcome-banner" id="welcome-banner">
       <div class="welcome-left">
         <h2 id="welcome-title">Welcome back! 👋</h2>
@@ -73,7 +65,6 @@
       </div>
     </div>
 
-    <!-- Analytics & Bunk Simulator -->
     <section class="analytics-simulator-bar">
       <div class="analytics-card">
         <h3>📈 Subject Health</h3>
@@ -92,10 +83,8 @@
           </div>
         </div>
       </div>
-      
       <div class="simulator-card">
         <h3>🧮 Bunk Simulator</h3>
-        <!-- Locked state container when no courses exist -->
         <div class="sim-locked-state" id="sim-locked-state" style="display:none; text-align:center; padding: 24px 0; margin-top: 15px;">
           <span style="font-size: 2.2rem; display: block; margin-bottom: 12px; filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.3));">🔒</span>
           <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px;">Simulator Locked</span>
@@ -108,7 +97,6 @@
             <div class="sim-group">
               <label for="sim-subject-select">Course & Component</label>
               <select id="sim-subject-select">
-                <!-- Injected by JS -->
               </select>
             </div>
             <div class="sim-group">
@@ -132,7 +120,6 @@
       </div>
     </section>
 
-    <!-- Timetable Toggle -->
     <section class="timetable-toggle-bar">
       <button class="btn-timetable-toggle" id="btn-toggle-timetable">
         <span>🗓️</span> Today's Schedule
@@ -140,21 +127,17 @@
       </button>
     </section>
 
-    <!-- Timetable View (collapsible) -->
     <section class="timetable-section collapsed" id="timetable-section">
       <div class="timetable-grid" id="timetable-grid">
-        <!-- Injected by JS -->
       </div>
     </section>
 
-    <!-- Add-Course Bar -->
     <section class="add-course-bar">
       <button class="btn-add-course" id="btn-open-add-modal" aria-label="Add new course">
         <span class="btn-icon">＋</span> Add Course
       </button>
     </section>
 
-    <!-- Dashboard Grid -->
     <section class="dashboard-grid" id="dashboard-grid">
       <div class="empty-state" id="empty-state" style="width: 100%; max-width: 500px; margin: 40px auto; padding: 30px; text-align: center; border-radius: var(--radius-lg); background: var(--bg-card); border: 1px solid var(--border); backdrop-filter: blur(20px);">
         <div class="empty-illustration" style="font-size: 3rem; margin-bottom: 12px; filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.4));">🎓</div>
@@ -164,7 +147,6 @@
       </div>
     </section>
 
-    <!-- History -->
     <section class="history-section" id="history-section">
       <h2 class="section-title"><span class="section-icon">🕑</span> Recent Activity</h2>
       <ul class="history-list" id="history-list"></ul>
@@ -173,7 +155,6 @@
 
   </main>
 
-  <!-- ═══ ADD/EDIT MODAL ═══ -->
   <div class="modal-overlay" id="modal-overlay" aria-hidden="true">
     <div class="modal" role="dialog" aria-labelledby="modal-title">
       <div class="modal-header">
@@ -206,7 +187,6 @@
     </div>
   </div>
 
-  <!-- ═══ CONFIRM DELETE DIALOG ═══ -->
   <div class="modal-overlay" id="confirm-overlay" aria-hidden="true">
     <div class="modal modal-confirm" role="alertdialog" aria-labelledby="confirm-title">
       <h3 id="confirm-title">Delete Course?</h3>
@@ -218,15 +198,12 @@
     </div>
   </div>
 
-  <!-- ═══ AUTH CONTAINER ═══ -->
   <div class="auth-overlay" id="auth-overlay" aria-hidden="true">
     <div class="auth-card">
       <div class="auth-brand">
         <h2>📊 Attend<span class="brand-accent">X</span></h2>
         <p>Your College Attendance Companion</p>
       </div>
-      
-      <!-- Login Form View -->
       <div class="auth-view" id="login-view">
         <h3>Welcome Back</h3>
         <form id="login-form">
@@ -243,7 +220,6 @@
         <p class="auth-switch">Don't have an account? <a href="#" id="to-register-btn">Register</a></p>
       </div>
 
-      <!-- Register Form View -->
       <div class="auth-view hidden" id="register-view">
         <h3>Create Account</h3>
         <form id="register-form">
@@ -264,7 +240,6 @@
         <p class="auth-switch">Already have an account? <a href="#" id="to-login-btn">Sign In</a></p>
       </div>
 
-      <!-- Verification View -->
       <div class="auth-view hidden" id="verification-view">
         <h3>Verify Email</h3>
         <p class="verification-desc">We sent a verification link to <strong id="user-email-placeholder">email</strong>.</p>
@@ -277,7 +252,6 @@
     </div>
   </div>
 
-  <!-- ═══ ONBOARDING OVERLAY ═══ -->
   <div class="modal-overlay" id="onboarding-overlay" aria-hidden="true">
     <div class="modal modal-onboarding" role="dialog" style="max-width:400px;text-align:center;">
       <h2 style="font-size:1.6rem;margin-bottom:6px;">🎓 Initialize Profile</h2>
@@ -309,7 +283,6 @@
     </div>
   </div>
 
-  <!-- ═══ SETTINGS MODAL ═══ -->
   <div class="modal-overlay" id="settings-overlay" aria-hidden="true">
     <div class="modal modal-settings" role="dialog" style="max-width: 500px;">
       <div class="modal-header">
@@ -322,8 +295,6 @@
         <button class="tab-btn" data-tab="tab-pomodoro">Focus Timer ⏱️</button>
         <button class="tab-btn" data-tab="tab-alerts">Email Alerts</button>
       </div>
-      
-      <!-- Profile tab -->
       <div class="tab-content" id="tab-profile">
         <form id="settings-profile-form">
           <div class="form-group">
@@ -350,8 +321,6 @@
           <button type="submit" class="btn btn-primary" style="width:100%;margin-top:10px;">Save Profile Settings</button>
         </form>
       </div>
-      
-      <!-- Timetable tab -->
       <div class="tab-content hidden" id="tab-timetable">
         <div class="timetable-editor-wrapper">
           <div class="day-select-wrapper" style="margin-bottom:14px;">
@@ -365,11 +334,8 @@
               <option value="6">Saturday</option>
             </select>
           </div>
-          
           <div class="timetable-slots-list" id="tt-slots-list" style="max-height:180px;overflow-y:auto;margin-bottom:16px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;background:var(--bg-input);">
-            <!-- List of current slots, dynamic deletion -->
           </div>
-          
           <form id="tt-add-slot-form" class="tt-add-form" style="border-top:1px solid var(--border);padding-top:14px;">
             <h4 style="font-size:0.85rem;margin-bottom:10px;color:var(--text-secondary);">Add Class Slot</h4>
             <div class="tt-form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
@@ -388,7 +354,6 @@
         </div>
       </div>
 
-      <!-- Pomodoro Timer tab -->
       <div class="tab-content hidden" id="tab-pomodoro">
         <div class="pomodoro-settings-container" style="padding: 10px 0;">
           <div class="pomo-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -418,7 +383,6 @@
         </div>
       </div>
 
-      <!-- Alerts tab -->
       <div class="tab-content hidden" id="tab-alerts">
         <form id="settings-alerts-form">
           <div class="form-group" style="display:flex; align-items:center; gap:10px;margin-bottom:16px;">
@@ -454,7 +418,6 @@
     </div>
   </div>
 
-  <!-- ═══ TOAST ═══ -->
   <div class="toast-container" id="toast-container"></div>
 
   <script type="module" src="app.js"></script>
