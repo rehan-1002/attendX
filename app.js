@@ -61,6 +61,13 @@ let currentUser = null;
     6: [], 
   };
 
+  const DEFAULT_ALERTS_CONFIG = {
+    enabled: true,
+    serviceId: 'service_cumb9in',
+    templateId: 'template_2wt1y28',
+    publicKey: 'iR4SdkDjIPclQHxNz'
+  };
+
   const Store = {
     _state: {
       courses: [],
@@ -1161,7 +1168,7 @@ let currentUser = null;
       document.getElementById('settings-name').value = Store._state.name || '';
       document.getElementById('settings-semester').value = Store._state.semester || 3;
       document.getElementById('settings-department').value = Store._state.department || '';
-      const config = Store._state.emailAlertsConfig || {};
+      const config = (Store._state.emailAlertsConfig && Store._state.emailAlertsConfig.serviceId) ? Store._state.emailAlertsConfig : DEFAULT_ALERTS_CONFIG;
       const alertsCheckbox = document.getElementById('alerts-enabled');
       alertsCheckbox.checked = config.enabled || false;
       document.getElementById('alerts-service-id').value = config.serviceId || '';
@@ -1379,6 +1386,10 @@ let currentUser = null;
       firestoreUnsubscribe = onSnapshot(doc(db, "users", uid), async (docSnap) => {
         if (docSnap.exists()) {
           Store._state = docSnap.data();
+          if (!Store._state.emailAlertsConfig || !Store._state.emailAlertsConfig.serviceId) {
+            Store._state.emailAlertsConfig = JSON.parse(JSON.stringify(DEFAULT_ALERTS_CONFIG));
+            Store._persist();
+          }
           const onboardOverlay = document.getElementById('onboarding-overlay');
           if (!Store._state.name || !Store._state.semester || !Store._state.department) {
             onboardOverlay.classList.add('open');
@@ -1391,7 +1402,8 @@ let currentUser = null;
           Store._state = {
             courses: [],
             history: [],
-            nextId: 1
+            nextId: 1,
+            emailAlertsConfig: JSON.parse(JSON.stringify(DEFAULT_ALERTS_CONFIG))
           };
           try {
             await setDoc(doc(db, "users", uid), Store._state);
@@ -1443,7 +1455,10 @@ let currentUser = null;
         emailjs.init(config.publicKey);
         const params = {
           to_email: auth.currentUser.email,
+          to_name: Store._state.name || 'Student',
+          subject_name: `${course.name} (${comp.type === 'theory' ? 'Theory' : 'Lab'})`,
           course_name: `${course.name} (${comp.type === 'theory' ? 'Theory' : 'Lab'})`,
+          current_percentage: Math.round(metrics.percentage),
           percentage: Math.round(metrics.percentage)
         };
         await emailjs.send(config.serviceId, config.templateId, params);
