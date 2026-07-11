@@ -1329,11 +1329,23 @@ let currentUser = null;
       onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         if (user) {
-          this.stopVerificationCheck();
-          $overlay.classList.remove('open');
-          $overlay.setAttribute('aria-hidden', 'true');
-          $headerLogoutBtn.style.display = 'block';
-          this.setupDatabaseSync(user.uid);
+          if (user.emailVerified) {
+            this.stopVerificationCheck();
+            $overlay.classList.remove('open');
+            $overlay.setAttribute('aria-hidden', 'true');
+            $headerLogoutBtn.style.display = 'block';
+            this.setupDatabaseSync(user.uid);
+          } else {
+            this.stopVerificationCheck();
+            $userEmailPlaceholder.textContent = user.email || '';
+            $loginView.classList.add('hidden');
+            $registerView.classList.add('hidden');
+            $verificationView.classList.remove('hidden');
+            $overlay.classList.add('open');
+            $overlay.setAttribute('aria-hidden', 'false');
+            $headerLogoutBtn.style.display = 'none';
+            this.startVerificationCheck();
+          }
         } else {
           this.stopVerificationCheck();
           if (firestoreUnsubscribe) {
